@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Snowflake, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import Head from "next/head";
 
 // Player type definition
 type Player = {
