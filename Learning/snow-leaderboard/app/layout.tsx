@@ -2,8 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'ARAM Snowball Fight',
-  description: 'A League of Legends ARAM snowballs hit leaderboard',
+  title: 'Snowball Fight',
+  description: 'An Aram snowballs hit leaderboard',
 }
 
 export default function RootLayout({

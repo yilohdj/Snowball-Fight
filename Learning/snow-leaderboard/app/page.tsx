@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Snowflake, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import Head from "next/head";
 
 // Player type definition
 type Player = {
@@ -121,12 +122,10 @@ export default function Home() {
           ))}
         </div>
       )}
-      
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* Header with esports style */}
         <div className="text-center mb-12">
           <div className="relative inline-block">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#00BFFF] via-[#87CEFA] to-[#00BFFF] opacity-75 blur"></div>
             <h1 className="relative text-5xl sm:text-6xl font-extrabold text-white mb-2 uppercase tracking-wider">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#87CEFA] to-[#E0FFFF]">
                 Snowball Fight
@@ -141,7 +140,7 @@ export default function Home() {
           </div>
           
           <p className="text-[#87CEFA] max-w-2xl mx-auto text-lg">
-            The ultimate display of skill on the Howling Abyss
+            The ultimate display of skill on the Howling Abyss.
           </p>
           
           {error && (
@@ -152,7 +151,6 @@ export default function Home() {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {/* Leaderboard container with Nordic/esports styling */}
           <div className="relative">
             {/* Decorative top corners */}
             <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-[#87CEFA]"></div>
@@ -163,8 +161,8 @@ export default function Home() {
               {/* Header bar */}
               <div className="bg-gradient-to-r from-[#0D2B4A] to-[#1E3A5F] p-4 border-b border-[#1E3A5F] relative overflow-hidden">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-white flex items-center">
-                    <Snowflake className="mr-2 h-6 w-6 text-[#87CEFA]" />
+                  <h2 className="text-2xl font-bold text-white text-left flex items-center gap-x-2">
+                    <img src="poro.png" width="75px" height="100px"></img>
                     <span>Leaderboard</span>
                   </h2>
                   
