@@ -1,9 +1,10 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 
 export const metadata: Metadata = {
-  title: 'Snow Leaderboard',
-  description: 'A stylized leaderboard with a snow theme',
+  title: 'ARAM Snowball Champions',
+  description: 'A League of Legends ARAM-themed snowball leaderboard',
 }
 
 export default function RootLayout({
@@ -13,6 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body>{children}</body>
     </html>
   )
