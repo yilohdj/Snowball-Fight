@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Snowflake, ExternalLink, ChevronRight } from 'lucide-react'
+import { Snowflake, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 // Player type definition
@@ -87,13 +87,8 @@ export default function Home() {
     
     fetchPlayers();
   }, []);
-
-  // Function to generate profile URL
-  const getProfileUrl = (player: Player) => {
-    return `/player/${player.puuid}`;
-  };
   
-  // Function to generate op.gg URL
+  // Function to generate u.gg URL
   const getUGGUrl = (player: Player) => {
     return `https://u.gg/lol/profile/na1/${player.name}-${player.tagline}/overview`;
   };
