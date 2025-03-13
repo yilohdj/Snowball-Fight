@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
+import { MongoClient } from "mongodb";
 
 // Define the player type
 type Player = {
@@ -11,6 +10,10 @@ type Player = {
   profileIconId: number
   region: string
 }
+const uri = process.env.MONGODB_URI; // Store in Vercel env vars
+var client = new MongoClient(uri)
+const dbName = "snowball-fight"; // Database name
+const collectionName = "leaderboard"; // Collection name
 
 export async function POST(request: Request) {
   try {
@@ -48,6 +51,10 @@ export async function POST(request: Request) {
     const apiKey = process.env.RIOT_API_KEY
 
     try {
+      await client.connect();
+      const db = client.db(dbName);
+      const collection = db.collection(collectionName);
+
       // Step 1: Retrieve PUUID
       const rootUrl = `https://${region2}.api.riotgames.com/`
       const puuidEndpoint = `riot/account/v1/accounts/by-riot-id/${encodeURIComponent(formData.summonerName)}/${encodeURIComponent(formData.tagLine)}`
@@ -109,20 +116,18 @@ export async function POST(request: Request) {
         profileIconId: profileIconId,
         region: formData.region
       }
+      await collection.updateOne(
+        { puuid }, // Find by puuid
+        { $set: entry }, // Update or set new values
+        { upsert: true } // Insert if not found
+      );
       
       // Read existing data file
-      const filePath = path.join(process.cwd(), "snowballs.json")
       let snowballs: Player[] = []
-      
-      try {
-        if (fs.existsSync(filePath)) {
-          const fileData = fs.readFileSync(filePath, "utf8")
-          snowballs = JSON.parse(fileData)
-        }
-      } catch (error) {
-        console.error("Error reading snowballs.json:", error)
-        // If there's an error reading the file, we'll start with an empty array
-      }
+      const leaderboard = await collection
+        .find({})
+        .sort({ snowballsHit: -1 })
+        .toArray();
       
       // Update or add player entry
       const index = snowballs.findIndex(player => player.puuid === puuid)
@@ -135,9 +140,6 @@ export async function POST(request: Request) {
       
       // Sort by snowballs hit (highest first)
       snowballs.sort((a, b) => b.snowballsHit - a.snowballsHit)
-      
-      // Write updated data back to file
-      fs.writeFileSync(filePath, JSON.stringify(snowballs, null, 2))
       
       return NextResponse.json({
         success: true,

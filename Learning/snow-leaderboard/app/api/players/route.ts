@@ -1,30 +1,32 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
+
+// MongoDB connection
+const uri = process.env.MONGODB_URI; // Store in Vercel env vars
+const client = new MongoClient(uri);
+const dbName = "snowball-fight"; // Database name
+const collectionName = "leaderboard"; // Collection name
 
 export async function GET() {
   try {
-    // Navigate two directories up from the current directory
-    const filePath = path.join(process.cwd(), './snowballs.json');
-    
-    // Check if the file exists
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json(
-        { error: 'Players data file not found' },
-        { status: 404 }
-      );
-    }
-    
-    // Read and parse the JSON file
-    const fileData = fs.readFileSync(filePath, 'utf8');
-    const players = JSON.parse(fileData);
-    
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    // Fetch all players, sorted by snowballsHit (highest first)
+    const players = await collection
+      .find({})
+      .sort({ snowballsHit: -1 }) // Descending order
+      .toArray();
+
     return NextResponse.json(players);
   } catch (error) {
-    console.error('Error reading players data:', error);
+    console.error("Database error:", error);
     return NextResponse.json(
-      { error: 'Failed to load players data' },
+      { error: "Failed to load players data" },
       { status: 500 }
     );
+  } finally {
+    await client.close();
   }
 }
