@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 
 // MongoDB connection
-const uri = process.env.MONGODB_URI; // Store in Vercel env vars
+const uri = process.env.MONGODB_URI ?? ""; // Store in Vercel env vars
 const client = new MongoClient(uri);
 const dbName = "snowball-fight"; // Database name
 const collectionName = "leaderboard"; // Collection name
