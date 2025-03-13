@@ -5,7 +5,7 @@ import path from 'path';
 export async function GET() {
   try {
     // Navigate two directories up from the current directory
-    const filePath = path.join(process.cwd(), '../snowballs.json');
+    const filePath = path.join(process.cwd(), './snowballs.json');
     
     // Check if the file exists
     if (!fs.existsSync(filePath)) {
