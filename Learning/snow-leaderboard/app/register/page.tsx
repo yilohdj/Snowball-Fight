@@ -38,12 +38,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-
-  // Set isClient to true when component mounts
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

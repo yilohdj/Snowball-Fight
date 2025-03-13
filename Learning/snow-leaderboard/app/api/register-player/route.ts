@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       const puuidResponse = await fetch(puuidUrl)
       if (!puuidResponse.ok) {
         return NextResponse.json(
-          { error: `PUUID error! Status: ${puuidResponse.status}` },
+          { error: `Request Error Status: ${puuidResponse.status}` },
           { status: puuidResponse.status }
         )
       }
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       
       if (!profileResponse.ok) {
         return NextResponse.json(
-          { error: `Profile icon ID error! Status: ${profileResponse.status}` },
+          { error: `Request Error Status: ${profileResponse.status}` },
           { status: profileResponse.status }
         )
       }
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       
       if (!challengeResponse.ok) {
         return NextResponse.json(
-          { error: `Challenge data error! Status: ${challengeResponse.status}` },
+          { error: `Request Error Status: ${challengeResponse.status}` },
           { status: challengeResponse.status }
         )
       }
