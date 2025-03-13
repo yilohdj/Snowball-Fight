@@ -10,8 +10,8 @@ type Player = {
   profileIconId: number
   region: string
 }
-const uri = process.env.MONGODB_URI; // Store in Vercel env vars
-var client = new MongoClient(uri)
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri)
 const dbName = "snowball-fight"; // Database name
 const collectionName = "leaderboard"; // Collection name
 
@@ -123,28 +123,15 @@ export async function POST(request: Request) {
       );
       
       // Read existing data file
-      let snowballs: Player[] = []
       const leaderboard = await collection
         .find({})
         .sort({ snowballsHit: -1 })
         .toArray();
       
-      // Update or add player entry
-      const index = snowballs.findIndex(player => player.puuid === puuid)
-      
-      if (index === -1) {
-        snowballs.push(entry)
-      } else {
-        snowballs[index] = entry
-      }
-      
-      // Sort by snowballs hit (highest first)
-      snowballs.sort((a, b) => b.snowballsHit - a.snowballsHit)
-      
       return NextResponse.json({
         success: true,
         message: "Player registered successfully",
-        player: entry
+        leaderboard
       })
       
     } catch (error) {
