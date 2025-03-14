@@ -1,9 +1,8 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import React, { useState} from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Snowflake } from "lucide-react"
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import Link from "next/link"
 
 // Define regions for the dropdown - now with expanded list
@@ -27,30 +26,25 @@ const REGIONS = [
 
 export default function RegisterPage() {
   const router = useRouter()
-
+  
   // Form state - using a single object for form data
   const [formData, setFormData] = useState({
     summonerName: "",
     tagLine: "",
-    region: "na1",
+    region: "na1"
   })
-
+  
   // UI state
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }))
   }
 
@@ -78,11 +72,12 @@ export default function RegisterPage() {
 
       // Show success message
       setSuccess(true)
-
+      
       // Optional: Redirect after success
       setTimeout(() => {
         router.push("/")
       }, 3000)
+      
     } catch (err) {
       console.error("Registration error:", err)
       setError(err instanceof Error ? err.message : "An unknown error occurred")
@@ -91,79 +86,39 @@ export default function RegisterPage() {
     }
   }
 
-  // Snowflakes component
-  const Snowflakes = () => {
-    if (!isClient) return null
-
-    const snowflakeCount = isClient && window.innerWidth < 768 ? 10 : 20
-    const snowflakeSize = (size: number) => Math.random() * size + (window.innerWidth < 768 ? 6 : 10)
-
-    return (
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {Array.from({ length: snowflakeCount }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-[#87CEFA] animate-fall"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `-20px`,
-              animationDuration: `${Math.random() * 10 + 5}s`,
-              animationDelay: `${Math.random() * 5}s`,
-              opacity: Math.random() * 0.5 + 0.2,
-            }}
-          >
-            <Snowflake size={snowflakeSize(8)} />
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0A1A2F] to-[#0D2B4A] relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute top-0 left-0 w-full h-full"
-          style={{
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "30px 30px",
-          }}
-        ></div>
+        <div className="absolute top-0 left-0 w-full h-full" 
+             style={{backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "30px 30px"}}></div>
       </div>
 
-      {/* Snowflakes */}
-      <Snowflakes />
-
-      <div className="container mx-auto px-4 py-6 md:py-12 relative z-10">
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="max-w-md mx-auto">
-          <Link
-            href="/"
-            className="inline-flex items-center text-[#87CEFA] hover:text-white mb-4 md:mb-6 transition-colors text-sm md:text-base"
-          >
-            <ArrowLeft className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
+          <Link href="/" className="inline-flex items-center text-[#87CEFA] hover:text-white mb-6 transition-colors">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Leaderboard
           </Link>
 
           <div className="relative">
             {/* Decorative top corners */}
-            <div className="absolute -top-2 -left-2 w-6 h-6 md:w-8 md:h-8 border-t-2 border-l-2 border-[#87CEFA]"></div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 border-t-2 border-r-2 border-[#87CEFA]"></div>
-
+            <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-[#87CEFA]"></div>
+            <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-[#87CEFA]"></div>
+            
             <div className="bg-[#0A1A2F]/80 backdrop-blur-sm border border-[#1E3A5F] rounded-lg overflow-hidden shadow-[0_0_15px_rgba(135,206,250,0.2)]">
-              <div className="p-4 md:p-6">
-                <div className="text-center mb-4 md:mb-6">
-                  <h1 className="text-xl md:text-2xl font-bold text-white flex items-center justify-center">
-                    <Snowflake className="mr-1.5 md:mr-2 h-5 w-5 md:h-6 md:w-6 text-[#87CEFA]" />
+              <div className="p-6">
+                <div className="text-center mb-6">
+                  <h1 className="text-2xl font-bold text-white flex items-center justify-center">
                     Add or Update Stats
                   </h1>
-                  <p className="text-[#87CEFA] mt-1 md:mt-2 text-sm md:text-base">
+                  <p className="text-[#87CEFA] mt-2">
                     Enter your name and tagline to add/update information.
                   </p>
                 </div>
 
                 {success ? (
-                  <div className="bg-[#1E3A5F] border border-[#87CEFA]/30 text-[#87CEFA] px-3 py-2 md:px-4 md:py-3 rounded relative mb-4 text-sm md:text-base">
+                  <div className="bg-[#1E3A5F] border border-[#87CEFA]/30 text-[#87CEFA] px-4 py-3 rounded relative mb-4">
                     <p>
                       <strong>Success!</strong> Redirecting you back...
                     </p>
@@ -171,14 +126,14 @@ export default function RegisterPage() {
                 ) : (
                   <form onSubmit={handleSubmit}>
                     {error && (
-                      <div className="bg-red-900/50 border border-red-700/50 text-red-200 px-3 py-2 md:px-4 md:py-3 rounded relative mb-4 text-sm md:text-base">
+                      <div className="bg-red-900/50 border border-red-700/50 text-red-200 px-4 py-3 rounded relative mb-4">
                         <p>{error}</p>
                       </div>
                     )}
 
-                    <div className="space-y-3 md:space-y-4">
-                      <div className="space-y-1 md:space-y-2">
-                        <label htmlFor="summonerName" className="block text-[#87CEFA] font-medium text-sm md:text-base">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label htmlFor="summonerName" className="block text-[#87CEFA] font-medium">
                           Summoner Name
                         </label>
                         <input
@@ -187,12 +142,12 @@ export default function RegisterPage() {
                           value={formData.summonerName}
                           onChange={handleChange}
                           placeholder="Your in-game name"
-                          className="w-full px-3 py-1.5 md:py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white placeholder-[#87CEFA]/50 focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent text-sm md:text-base"
+                          className="w-full px-3 py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white placeholder-[#87CEFA]/50 focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent"
                         />
                       </div>
 
-                      <div className="space-y-1 md:space-y-2">
-                        <label htmlFor="tagLine" className="block text-[#87CEFA] font-medium text-sm md:text-base">
+                      <div className="space-y-2">
+                        <label htmlFor="tagLine" className="block text-[#87CEFA] font-medium">
                           Tag Line
                         </label>
                         <input
@@ -201,15 +156,15 @@ export default function RegisterPage() {
                           value={formData.tagLine}
                           onChange={handleChange}
                           placeholder="Your tag (e.g. NA1)"
-                          className="w-full px-3 py-1.5 md:py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white placeholder-[#87CEFA]/50 focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent text-sm md:text-base"
+                          className="w-full px-3 py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white placeholder-[#87CEFA]/50 focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent"
                         />
-                        <p className="text-[10px] md:text-xs text-[#87CEFA]/70">
+                        <p className="text-xs text-[#87CEFA]/70">
                           This is the part after the # in your Riot ID (e.g. YourName#<strong>NA1</strong>)
                         </p>
                       </div>
 
-                      <div className="space-y-1 md:space-y-2">
-                        <label htmlFor="region" className="block text-[#87CEFA] font-medium text-sm md:text-base">
+                      <div className="space-y-2">
+                        <label htmlFor="region" className="block text-[#87CEFA] font-medium">
                           Region
                         </label>
                         <select
@@ -217,7 +172,7 @@ export default function RegisterPage() {
                           name="region"
                           value={formData.region}
                           onChange={handleChange}
-                          className="w-full px-3 py-1.5 md:py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent max-h-60 overflow-y-auto text-sm md:text-base"
+                          className="w-full px-3 py-2 bg-[#1E3A5F]/50 border border-[#1E3A5F] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#87CEFA]/50 focus:border-transparent max-h-60 overflow-y-auto"
                         >
                           {REGIONS.map((region) => (
                             <option key={region.value} value={region.value}>
@@ -229,12 +184,12 @@ export default function RegisterPage() {
 
                       <button
                         type="submit"
-                        className="w-full px-3 py-1.5 md:px-4 md:py-2 bg-[#1E5F7A] hover:bg-[#2A7090] text-white rounded-md transition-colors shadow-lg hover:shadow-[0_0_15px_rgba(135,206,250,0.3)] flex items-center justify-center text-sm md:text-base mt-2"
+                        className="w-full px-4 py-2 bg-[#1E5F7A] hover:bg-[#2A7090] text-white rounded-md transition-colors shadow-lg hover:shadow-[0_0_15px_rgba(135,206,250,0.3)] flex items-center justify-center"
                         disabled={isLoading}
                       >
                         {isLoading ? (
                           <>
-                            <Loader2 className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Processing...
                           </>
                         ) : (
@@ -246,14 +201,14 @@ export default function RegisterPage() {
                 )}
               </div>
             </div>
-
+            
             {/* Decorative bottom corners */}
-            <div className="absolute -bottom-2 -left-2 w-6 h-6 md:w-8 md:h-8 border-b-2 border-l-2 border-[#87CEFA]"></div>
-            <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 border-b-2 border-r-2 border-[#87CEFA]"></div>
+            <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-[#87CEFA]"></div>
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-[#87CEFA]"></div>
           </div>
         </div>
       </div>
-
+      
       {/* Add the fall animation */}
       <style jsx>{`
         @keyframes fall {
@@ -277,4 +232,3 @@ export default function RegisterPage() {
     </main>
   )
 }
-
