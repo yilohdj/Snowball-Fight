@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2} from "lucide-react"
+import { ArrowLeft, Loader2, Snowflake } from "lucide-react"
 import Link from "next/link"
 
 // Define regions for the dropdown - now with expanded list
@@ -91,6 +91,34 @@ export default function RegisterPage() {
     }
   }
 
+  // Snowflakes component
+  const Snowflakes = () => {
+    if (!isClient) return null
+
+    const snowflakeCount = isClient && window.innerWidth < 768 ? 10 : 20
+    const snowflakeSize = (size: number) => Math.random() * size + (window.innerWidth < 768 ? 6 : 10)
+
+    return (
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {Array.from({ length: snowflakeCount }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-[#87CEFA] animate-fall"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `-20px`,
+              animationDuration: `${Math.random() * 10 + 5}s`,
+              animationDelay: `${Math.random() * 5}s`,
+              opacity: Math.random() * 0.5 + 0.2,
+            }}
+          >
+            <Snowflake size={snowflakeSize(8)} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0A1A2F] to-[#0D2B4A] relative overflow-hidden">
       {/* Background pattern */}
@@ -105,6 +133,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Snowflakes */}
+      <Snowflakes />
 
       <div className="container mx-auto px-4 py-6 md:py-12 relative z-10">
         <div className="max-w-md mx-auto">
@@ -125,6 +154,7 @@ export default function RegisterPage() {
               <div className="p-4 md:p-6">
                 <div className="text-center mb-4 md:mb-6">
                   <h1 className="text-xl md:text-2xl font-bold text-white flex items-center justify-center">
+                    <Snowflake className="mr-1.5 md:mr-2 h-5 w-5 md:h-6 md:w-6 text-[#87CEFA]" />
                     Add or Update Stats
                   </h1>
                   <p className="text-[#87CEFA] mt-1 md:mt-2 text-sm md:text-base">
