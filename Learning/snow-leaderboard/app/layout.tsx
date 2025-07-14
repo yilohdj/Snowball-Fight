@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Snowball Fight',
-  description: 'An Aram snowballs hit leaderboard',
+  description: 'An Aram Snowballs Hit Leaderboard',
 }
 
 export default function RootLayout({
