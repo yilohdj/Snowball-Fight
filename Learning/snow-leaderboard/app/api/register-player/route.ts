@@ -123,7 +123,7 @@ export async function POST(request: Request) {
           error = "Server Side Error"
         }
         return NextResponse.json(
-          { error: `Request Error Status: ${profileResponse.status}` },
+          { error: `Request Error Status: ${profileResponse.status}: ${error}` },
           { status: profileResponse.status }
         )
       }

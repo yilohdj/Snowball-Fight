@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Snowflake, ChevronRight, PlusCircle, Search, X, ChevronLeft, ChevronFirst, ChevronLast } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 // Player type definition
 type Player = {
@@ -185,7 +186,7 @@ export default function Home() {
               <div className="bg-gradient-to-r from-[#0D2B4A] to-[#1E3A5F] p-4 border-b border-[#1E3A5F] relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold text-white text-left flex items-center gap-x-2">
-                    <img src="poro.png" width="75px" height="100px" alt="Poro" />
+                    <Image src="/poro.png" width={75} height={100} alt="Poro" />
                     <span>Leaderboard</span>
                   </h2>
 
@@ -282,14 +283,13 @@ export default function Home() {
                           {/* Profile icon with stylized border */}
                           <div className="relative h-12 w-12 rounded-full mr-4 shrink-0 border-2 border-[#1E3A5F] overflow-hidden group-hover:border-[#87CEFA]/50 transition-colors duration-300">
                             {/* Profile image */}
-                            <img
+                            <Image
                               src={`https://ddragon.leagueoflegends.com/cdn/15.5.1/img/profileicon/${player.profileIconId}.png`}
                               alt={`${player.name}'s profile`}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "https://ddragon.leagueoflegends.com/cdn/15.5.1/img/profileicon/1.png"
-                              }}
+                              unoptimized
                             />
                           </div>
 
