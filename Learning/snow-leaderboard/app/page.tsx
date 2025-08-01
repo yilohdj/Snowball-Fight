@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Snowflake, ChevronRight, PlusCircle, Search, X, ChevronLeft, ChevronFirst, ChevronLast } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { getProfileIconSrc, isLocalIcon } from "@/lib/profileIcons"
 
 // Player type definition
 type Player = {
@@ -216,11 +217,11 @@ export default function Home() {
                       </button>
                     )}
                   </div>
-                  {searchQuery && (
-                    <div className="mt-2 text-sm text-[#87CEFA]/80">
-                      Found {filteredPlayers.length} player{filteredPlayers.length !== 1 ? 's' : ''}
-                    </div>
-                  )}
+                                     {searchQuery && (
+                     <div className="mt-2 text-sm text-[#87CEFA]/80">
+                       Found {filteredPlayers.length} player{filteredPlayers.length !== 1 ? 's' : ''}
+                     </div>
+                   )}
                 </div>
               </div>
 
@@ -242,8 +243,9 @@ export default function Home() {
                         </div>
                       </div>
                                           ) : (
-                        currentPlayers.map((player, index) => {
-                          const globalIndex = startIndex + index
+                        currentPlayers.map((player) => {
+                          // Find the player's global position in the sorted players array
+                          const globalIndex = players.findIndex(p => p.puuid === player.puuid)
                           return (
                           <Link
                             key={player.puuid || globalIndex}
@@ -284,12 +286,12 @@ export default function Home() {
                           <div className="relative h-12 w-12 rounded-full mr-4 shrink-0 border-2 border-[#1E3A5F] overflow-hidden group-hover:border-[#87CEFA]/50 transition-colors duration-300">
                             {/* Profile image */}
                             <Image
-                              src={`https://ddragon.leagueoflegends.com/cdn/15.5.1/img/profileicon/${player.profileIconId}.png`}
+                              src={getProfileIconSrc(player.profileIconId)}
                               alt={`${player.name}'s profile`}
                               width={48}
                               height={48}
                               className="w-full h-full object-cover"
-                              unoptimized
+                              unoptimized={!isLocalIcon(player.profileIconId)}
                             />
                           </div>
 
