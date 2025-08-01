@@ -17,11 +17,19 @@ class RateLimiter {
   // Clean up expired entries
   private cleanup() {
     const now = Date.now()
-    for (const [key, entry] of this.requests.entries()) {
+    const keysToDelete: string[] = []
+    
+    // Collect keys to delete to avoid modifying map during iteration
+    this.requests.forEach((entry, key) => {
       if (now > entry.resetTime) {
-        this.requests.delete(key)
+        keysToDelete.push(key)
       }
-    }
+    })
+    
+    // Delete expired entries
+    keysToDelete.forEach(key => {
+      this.requests.delete(key)
+    })
   }
 
   // Check if request is allowed
@@ -32,7 +40,7 @@ class RateLimiter {
     const entry = this.requests.get(identifier)
     
     if (!entry) {
-      // First request from this identifier
+      // First request for this identifier
       this.requests.set(identifier, {
         count: 1,
         resetTime: now + this.windowMs
@@ -46,10 +54,11 @@ class RateLimiter {
     
     if (now > entry.resetTime) {
       // Window has expired, reset
-      this.requests.set(identifier, {
+      const newEntry = {
         count: 1,
         resetTime: now + this.windowMs
-      })
+      }
+      this.requests.set(identifier, newEntry)
       return {
         allowed: true,
         remaining: this.maxRequests - 1,
@@ -76,49 +85,44 @@ class RateLimiter {
       resetTime: entry.resetTime
     }
   }
-
-  // Get client IP from request
-  getClientIP(request: Request): string {
-    // Try to get real IP from various headers
-    const forwarded = request.headers.get('x-forwarded-for')
-    const realIP = request.headers.get('x-real-ip')
-    const cfConnectingIP = request.headers.get('cf-connecting-ip')
-    
-    if (forwarded) {
-      return forwarded.split(',')[0].trim()
-    }
-    if (realIP) {
-      return realIP
-    }
-    if (cfConnectingIP) {
-      return cfConnectingIP
-    }
-    
-    // Fallback to a default identifier
-    return 'unknown'
-  }
 }
 
-// Create rate limiter instances for different endpoints
+// Create rate limiter instances
 export const registerPlayerRateLimiter = new RateLimiter(60000, 3) // 3 requests per minute
 export const generalAPIRateLimiter = new RateLimiter(60000, 10) // 10 requests per minute
 
-// Helper function to check rate limit
-export function checkRateLimit(request: Request, limiter: RateLimiter) {
-  const clientIP = limiter.getClientIP(request)
-  const result = limiter.isAllowed(clientIP)
+// Helper function to get client IP
+function getClientIP(request: Request): string {
+  // Try to get IP from various headers
+  const forwarded = request.headers.get('x-forwarded-for')
+  const realIP = request.headers.get('x-real-ip')
+  const cfConnectingIP = request.headers.get('cf-connecting-ip')
   
-  return {
-    ...result,
-    clientIP
+  if (forwarded) {
+    return forwarded.split(',')[0].trim()
   }
+  if (realIP) {
+    return realIP
+  }
+  if (cfConnectingIP) {
+    return cfConnectingIP
+  }
+  
+  // Fallback to a default identifier
+  return 'unknown'
 }
 
-// Helper function to create rate limit headers
+// Check rate limit for a request
+export function checkRateLimit(request: Request, rateLimiter: RateLimiter) {
+  const identifier = getClientIP(request)
+  return rateLimiter.isAllowed(identifier)
+}
+
+// Create rate limit headers
 export function createRateLimitHeaders(remaining: number, resetTime: number) {
-  return {
-    'X-RateLimit-Remaining': remaining.toString(),
-    'X-RateLimit-Reset': new Date(resetTime).toISOString(),
-    'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString()
-  }
+  const headers = new Headers()
+  headers.set('X-RateLimit-Remaining', remaining.toString())
+  headers.set('X-RateLimit-Reset', resetTime.toString())
+  headers.set('Retry-After', Math.ceil((resetTime - Date.now()) / 1000).toString())
+  return headers
 } 

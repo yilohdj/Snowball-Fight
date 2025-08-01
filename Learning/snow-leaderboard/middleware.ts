@@ -16,8 +16,12 @@ export function middleware(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     
-    // Log API requests for monitoring
-    console.log(`[${new Date().toISOString()}] ${request.method} ${request.nextUrl.pathname} - ${request.ip || 'unknown IP'}`)
+    // Log API requests
+    const clientIP = request.headers.get('x-forwarded-for') || 
+                    request.headers.get('x-real-ip') || 
+                    request.headers.get('cf-connecting-ip') || 
+                    'unknown IP'
+    console.log(`[${new Date().toISOString()}] ${request.method} ${request.nextUrl.pathname} - ${clientIP}`)
     
     return response
   }
