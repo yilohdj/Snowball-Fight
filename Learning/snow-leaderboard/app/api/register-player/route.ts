@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { MongoClient } from "mongodb";
+import { MongoClient } from "mongodb"
+import { checkRateLimit, createRateLimitHeaders, registerPlayerRateLimiter } from "@/lib/rateLimit"
 
 // Define the player type
 type Player = {
@@ -10,13 +11,32 @@ type Player = {
   profileIconId: number
   region: string
 }
-const uri = process.env.MONGODB_URI ?? "";
+
+const uri = process.env.MONGODB_URI ?? ""
 const client = new MongoClient(uri)
-const dbName = "snowball-fight"; // Database name
-const collectionName = "leaderboard"; // Collection name
+const dbName = "snowball-fight" // Database name
+const collectionName = "leaderboard" // Collection name
 
 export async function POST(request: Request) {
   try {
+    // Check rate limit first
+    const rateLimitResult = checkRateLimit(request, registerPlayerRateLimiter)
+    
+    if (!rateLimitResult.allowed) {
+      const headers = createRateLimitHeaders(rateLimitResult.remaining, rateLimitResult.resetTime)
+      
+      return NextResponse.json(
+        { 
+          error: "Rate limit exceeded. Please try again later.",
+          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+        },
+        { 
+          status: 429,
+          headers
+        }
+      )
+    }
+
     // Parse the request body
     const formData = await request.json()
 
@@ -51,9 +71,9 @@ export async function POST(request: Request) {
     const apiKey = process.env.RIOT_API_KEY
 
     try {
-      await client.connect();
-      const db = client.db(dbName);
-      const collection = db.collection(collectionName);
+      await client.connect()
+      const db = client.db(dbName)
+      const collection = db.collection(collectionName)
 
       // Step 1: Retrieve PUUID
       const rootUrl = `https://${region2}.api.riotgames.com/`
@@ -62,8 +82,21 @@ export async function POST(request: Request) {
       
       const puuidResponse = await fetch(puuidUrl)
       if (!puuidResponse.ok) {
+        let error = ""
+        if (puuidResponse.status == 400 || puuidResponse.status == 401 || puuidResponse.status == 403) {
+          error = "Client Side Error"
+        }
+        if (puuidResponse.status == 404) {
+          error = "Summoner Not Found"
+        }
+        if (puuidResponse.status == 429) {
+          error = "Rate Limit Exceeded"
+        }
+        if (puuidResponse.status == 500 || puuidResponse.status == 502 || puuidResponse.status == 503 || puuidResponse.status == 504) {
+          error = "Server Side Error"
+        }
         return NextResponse.json(
-          { error: `Request Error Status: ${puuidResponse.status}` },
+          { error: `Request Error Status ${puuidResponse.status}: ${error}` },
           { status: puuidResponse.status }
         )
       }
@@ -76,6 +109,19 @@ export async function POST(request: Request) {
       const profileResponse = await fetch(profileEndpoint)
       
       if (!profileResponse.ok) {
+        let error = ""
+        if (profileResponse.status == 400 || profileResponse.status == 401 || profileResponse.status == 403) {
+          error = "Client Side Error"
+        }
+        if (profileResponse.status == 404) {
+          error = "Summoner Not Found"
+        }
+        if (profileResponse.status == 429) {
+          error = "Rate Limit Exceeded"
+        }
+        if (profileResponse.status == 500 || profileResponse.status == 502 || profileResponse.status == 503 || profileResponse.status == 504) {
+          error = "Server Side Error"
+        }
         return NextResponse.json(
           { error: `Request Error Status: ${profileResponse.status}` },
           { status: profileResponse.status }
@@ -90,8 +136,21 @@ export async function POST(request: Request) {
       const challengeResponse = await fetch(challengeEndpoint)
       
       if (!challengeResponse.ok) {
+        let error = ""
+        if (challengeResponse.status == 400 || challengeResponse.status == 401 || challengeResponse.status == 403) {
+          error = "Client Side Error"
+        }
+        if (challengeResponse.status == 404) {
+          error = "Summoner Not Found"
+        }
+        if (challengeResponse.status == 429) {
+          error = "Rate Limit Exceeded"
+        }
+        if (challengeResponse.status == 500 || challengeResponse.status == 502 || challengeResponse.status == 503 || challengeResponse.status == 504) {
+          error = "Server Side Error"
+        }
         return NextResponse.json(
-          { error: `Request Error Status: ${challengeResponse.status}` },
+          { error: `Request Error Status ${challengeResponse.status}: ${error}` },
           { status: challengeResponse.status }
         )
       }
@@ -120,19 +179,22 @@ export async function POST(request: Request) {
         { puuid }, // Find by puuid
         { $set: entry }, // Update or set new values
         { upsert: true } // Insert if not found
-      );
+      )
       
       // Read existing data file
       const leaderboard = await collection
         .find({})
         .sort({ snowballsHit: -1 })
-        .toArray();
+        .toArray()
+      
+      // Add rate limit headers to successful response
+      const headers = createRateLimitHeaders(rateLimitResult.remaining, rateLimitResult.resetTime)
       
       return NextResponse.json({
         success: true,
         message: "Player registered successfully",
         leaderboard
-      })
+      }, { headers })
       
     } catch (error) {
       console.error("API or file operation error:", error)

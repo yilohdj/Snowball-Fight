@@ -67,6 +67,11 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle rate limit errors specifically
+        if (response.status === 429) {
+          const retryAfter = data.retryAfter || 60
+          throw new Error(`Rate limit exceeded. Please wait ${retryAfter} seconds before trying again.`)
+        }
         throw new Error(data.error || "Failed to register player")
       }
 
